@@ -1,26 +1,30 @@
-package org.eduard
+package org.eduard.server
 
+import org.eduard.PropertiesReader
+import org.eduard.exception.InitializingException
+import org.eduard.handler.ClientHandlerSeaBattle
 import java.net.ServerSocket
 import kotlin.concurrent.thread
 import kotlin.system.exitProcess
 
 fun main() {
-    Server()
+    Server().run()
 }
+
 class Server {
-    private var PORT : Int
+    private var PORT: Int
     private val socket: ServerSocket
+
     init {
         try {
             val configReader = PropertiesReader.instance
-            PORT = configReader.properties.get("port")?.toInt() ?: throw Exception("Port is not configured")
-            println("Server started on port $PORT")
-        }
-        catch (ex: Exception) {
-            println("Error while reading configurations. Server did not start.\nCause: ${ex.localizedMessage}")
-            exitProcess(0)
+            PORT = configReader.properties.get("port")?.toInt() ?: throw Exception("Port configuration is missing")
+        } catch (ex: Exception) {
+            println("Error while reading configurations.\nCause: ${ex.localizedMessage}")
+            throw InitializingException()
         }
         socket = ServerSocket(PORT)
+        println("Server started on port $PORT")
     }
 
     fun run() {

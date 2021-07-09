@@ -1,4 +1,4 @@
-package org.eduard
+package org.eduard.handler
 
 interface ClientHandler {
     fun handle()
