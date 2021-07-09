@@ -7,16 +7,17 @@ class PropertiesReader {
     val properties = HashMap<String, String>()
     init {
         try {
-            val inputStream: InputStream = File("./src/main/resources/server.conf").inputStream()
+            val inputStream: InputStream = File("./src/main/resources/application.conf").inputStream()
             inputStream.bufferedReader().useLines { lines ->
                 lines.forEach { line ->
                     if (!line.isBlank()) {
                         val params = line.split("=")
-                        properties.put(params[0].trim(), params[1].trim())
+                        if (params.size == 2) properties.put(params[0].trim(), params[1].trim()) else println("Could not read params: $line")
                     }
                 }
             }
-        } catch (ex: Exception) {
+        }
+        catch (ex: Exception) {
             println("Could not read any params. Cause: ${ex.localizedMessage}")
         }
     }
