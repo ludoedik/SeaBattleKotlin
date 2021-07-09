@@ -11,4 +11,9 @@ repositories {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation("com.zaxxer:HikariCP:3.3.0")
+    implementation group: 'com.h2database', name: 'h2', version: '1.4.200'
+    implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.9.8'
+    //compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.29'
+
 }
