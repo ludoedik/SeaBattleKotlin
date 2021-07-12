@@ -32,16 +32,6 @@ class DataSource {
         hikariConfig.username = username
         hikariConfig.password = password
         hikariDatasource = HikariDataSource(hikariConfig)
-        /*val connection: Connection = getConnection()
-        val statement = connection.prepareStatement("drop table if exists Client;\n" +
-                "create table Client\n" +
-                "(\n" +
-                "    ID INTEGER auto_increment,\n" +
-                "    USERNAME VARCHAR not null,\n" +
-                "    PASSWORD VARCHAR not null\n" +
-                ");")
-        statement.execute()
-        connection.close()*/
     }
 
     fun getConnection(): Connection{

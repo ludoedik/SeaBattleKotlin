@@ -1,15 +1,10 @@
-package org.eduard.server
+package org.eduard.controller
 
 import org.eduard.PropertiesReader
 import org.eduard.exception.InitializingException
 import org.eduard.handler.ClientHandlerSeaBattle
 import java.net.ServerSocket
 import kotlin.concurrent.thread
-import kotlin.system.exitProcess
-
-fun main() {
-    Server().run()
-}
 
 class Server {
     private var PORT: Int
@@ -31,7 +26,6 @@ class Server {
         while (true) {
             val client = socket.accept()
             println("Client connected: ${client.inetAddress.hostAddress}")
-            // Run client in it's own thread.
             thread { ClientHandlerSeaBattle(client).handle() }
         }
     }

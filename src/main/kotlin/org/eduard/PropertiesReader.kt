@@ -10,9 +10,9 @@ class PropertiesReader {
             val inputStream: InputStream = File("./src/main/resources/application.conf").inputStream()
             inputStream.bufferedReader().useLines { lines ->
                 lines.forEach { line ->
-                    if (!line.isBlank()) {
+                    if (line.isNotBlank()) {
                         val params = line.split("=")
-                        if (params.size == 2) properties.put(params[0].trim(), params[1].trim()) else println("Could not read params: $line")
+                        if (params.size == 2) properties[params[0].trim()] = params[1].trim() else println("Could not read params: $line")
                     }
                 }
             }
