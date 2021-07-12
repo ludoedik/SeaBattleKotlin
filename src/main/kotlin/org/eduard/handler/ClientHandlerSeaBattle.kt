@@ -2,9 +2,9 @@ package org.eduard.handler
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import org.eduard.Message
-import org.eduard.exception.NoSuchCommandException
-import org.eduard.service.ClientService
+import org.eduard.exception.business.BusinessException
+import org.eduard.exception.critical.CriticalServerException
+import org.eduard.service.ClientServiceImpl
 import java.io.BufferedReader
 import java.io.PrintWriter
 import java.net.Socket
@@ -13,12 +13,12 @@ class ClientHandlerSeaBattle(private val client: Socket) : ClientHandler {
     private val reader: BufferedReader = client.getInputStream().bufferedReader()
     private val writer: PrintWriter = PrintWriter(client.getOutputStream())
     private var running = false
-    private var isAuthorized = false
-    private val clientService = ClientService()
-    private val operationsMap = mapOf(
-        "auth" to clientService::authorize,
-    )
+    private val clientService = ClientServiceImpl()
     private val objectMapper = jacksonObjectMapper()
+
+    private val operationsMap = mapOf(
+        Commands.REGISTRATION to clientService::addUser,
+    )
 
     override fun handle() {
         running = true
@@ -26,23 +26,33 @@ class ClientHandlerSeaBattle(private val client: Socket) : ClientHandler {
             try {
                 val message: Message = objectMapper.readValue(reader.readLine())
                 val operation = operationsMap[message.command]
-                val response: String?
+                val response: Response?
                 if (operation != null)
                     response = operation.invoke(message.value)
-                else throw NoSuchCommandException()
-                writer.println(response)
+                else {
+                    response = Response(Status.ERROR, "Not valid command")
+                    println(response.message)
+                }
+                writer.println(objectMapper.writeValueAsString(response))
                 writer.flush()
-            } catch (ex: NoSuchCommandException) {
-                println("Not valid operation")
-                writer.println("Not valid command")
+            } catch (ex: BusinessException) {
+                println(ex.message)
+                writer.println(objectMapper.writeValueAsString(Response(Status.ERROR, ex.message ?: "Error")))
                 writer.flush()
+            } catch (ex: CriticalServerException) {
+                close(ex.message ?: "Critical error happened")
+                running = false
             } catch (ex: NullPointerException) {
-                println("Socket closed. Message: ${ex.localizedMessage}")
-                reader.close()
-                writer.close()
-                client.close()
+                close(ex.localizedMessage)
                 running = false
             }
         }
+    }
+
+    private fun close(message: String) {
+        println("Socket closed. Message: $message")
+        reader.close()
+        writer.close()
+        client.close()
     }
 }
